@@ -25,7 +25,7 @@ public class ManageCustomer extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }
 
-    private boolean validateFields() {
+      private boolean validateFields() {
         if (!txtName.getText().equals("") && !txtMobileNumber.getText().equals("") && !txtEmail.getText().equals("")) {
             return false;
         } else {
@@ -56,6 +56,8 @@ public class ManageCustomer extends javax.swing.JFrame {
         btnReset = new javax.swing.JButton();
         btnClose = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
+        btnDelete = new javax.swing.JButton();
+        jLabel6 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
@@ -139,16 +141,25 @@ public class ManageCustomer extends javax.swing.JFrame {
             }
         });
         getContentPane().add(btnClose, new org.netbeans.lib.awtextra.AbsoluteConstraints(761, 349, -1, -1));
-
-        jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/All_page_Background.png"))); // NOI18N
         getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 850, -1));
+
+        btnDelete.setText("Delete");
+        btnDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeleteActionPerformed(evt);
+            }
+        });
+        getContentPane().add(btnDelete, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 390, 350, -1));
+
+        jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/All_page_Background.png"))); // NOI18N
+        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 0, 1010, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
-        DefaultTableModel model = (DefaultTableModel) tableCustomer.getModel();
+          DefaultTableModel model = (DefaultTableModel) tableCustomer.getModel();
         try {
             Connection con = ConnectionProvider.getCon();
             Statement st = con.createStatement();
@@ -176,7 +187,7 @@ public class ManageCustomer extends javax.swing.JFrame {
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         // TODO add your handling code here:
-        String name = txtName.getText();
+           String name = txtName.getText();
         String mobileNumber = txtMobileNumber.getText();
         String email = txtEmail.getText();
 
@@ -205,7 +216,7 @@ public class ManageCustomer extends javax.swing.JFrame {
 
     private void tableCustomerMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableCustomerMouseClicked
         // TODO add your handling code here:
-        int index = tableCustomer.getSelectedRow();
+         int index = tableCustomer.getSelectedRow();
         TableModel model = tableCustomer.getModel();
         String id = model.getValueAt(index, 0).toString();
         customerPk = Integer.parseInt(id);
@@ -218,6 +229,7 @@ public class ManageCustomer extends javax.swing.JFrame {
 
         btnSave.setEnabled(false);
         btnUpdate.setEnabled(true);
+
 
 
     }//GEN-LAST:event_tableCustomerMouseClicked
@@ -250,43 +262,74 @@ public class ManageCustomer extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnUpdateActionPerformed
 
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
+   if (customerPk == 0) {
+        String errorMessage = "<html><body><b><font color='red'>Erreur:</font></b><br><i>Please select a customer to delete.</i></body></html>";
+        JOptionPane.showMessageDialog(null, errorMessage, "Erreur", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    // Confirm deletion
+    int confirm = JOptionPane.showConfirmDialog(null, 
+        "<html><body><b>Are you sure you want to delete this customer?</b></body></html>", 
+        "Confirm Deletion", JOptionPane.YES_NO_OPTION);
+
+    if (confirm == JOptionPane.YES_OPTION) {
+        try {
+            // Get database connection
+            Connection con = ConnectionProvider.getCon();
+            
+            // Prepare SQL delete query
+            PreparedStatement ps = con.prepareStatement("DELETE FROM customer WHERE customer_Pk = ?");
+            ps.setInt(1, customerPk);
+            
+            // Execute the delete query
+            int rowsAffected = ps.executeUpdate();
+            
+            if (rowsAffected > 0) {
+                String successMessage = "<html><body><b><font color='green'>Success:</font></b><br><i>Customer deleted successfully.</i></body></html>";
+                JOptionPane.showMessageDialog(null, successMessage, "Success", JOptionPane.INFORMATION_MESSAGE);
+                
+                // Refresh the table data after deletion
+                DefaultTableModel model = (DefaultTableModel) tableCustomer.getModel();
+                model.setRowCount(0); // Clear the table
+                formComponentShown(null); // Reload data to the table
+
+                // Reset the form fields and disable update/delete buttons
+                txtName.setText("");
+                txtMobileNumber.setText("");
+                txtEmail.setText("");
+                btnUpdate.setEnabled(false);
+                btnDelete.setEnabled(false);
+            } else {
+                String errorMessage = "<html><body><b><font color='red'>Error:</font></b><br><i>Error deleting customer. Please try again.</i></body></html>";
+                JOptionPane.showMessageDialog(null, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
+            String errorMessage = "<html><body><b><font color='red'>Exception:</font></b><br><i>" + e.getMessage() + "</i></body></html>";
+            JOptionPane.showMessageDialog(null, errorMessage, "Exception", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    }//GEN-LAST:event_btnDeleteActionPerformed
+
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ManageCustomer.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ManageCustomer.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ManageCustomer.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ManageCustomer.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
+   
+  public static void main(String[] args) {
+        // Directly instantiate ManageCustomer and make it visible
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
-                new ManageCustomer().setVisible(true);
+                new ManageCustomer().setVisible(true); // Create and show the form
             }
         });
     }
 
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClose;
+    private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnReset;
     private javax.swing.JButton btnSave;
     private javax.swing.JButton btnUpdate;
@@ -295,6 +338,7 @@ public class ManageCustomer extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tableCustomer;
     private javax.swing.JTextField txtEmail;

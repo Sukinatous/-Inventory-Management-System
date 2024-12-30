@@ -9,6 +9,6 @@ package dao;
  * @author pc
  */
 public class InventoryUtils {
-    public static String billPath="E:\\";
+    public static String billPath="C:\\Users\\hassi\\OneDrive\\Documents";
     
 }

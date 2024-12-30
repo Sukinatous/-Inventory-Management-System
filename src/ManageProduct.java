@@ -78,6 +78,8 @@ public class ManageProduct extends javax.swing.JFrame {
         btnReset = new javax.swing.JButton();
         btnClose = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
+        btnDelete = new javax.swing.JButton();
+        jLabel7 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
@@ -185,9 +187,19 @@ public class ManageProduct extends javax.swing.JFrame {
             }
         });
         getContentPane().add(btnClose, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 430, -1, -1));
-
-        jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/All_page_Background.png"))); // NOI18N
         getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -50, -1, 710));
+
+        btnDelete.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        btnDelete.setText("Delete");
+        btnDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeleteActionPerformed(evt);
+            }
+        });
+        getContentPane().add(btnDelete, new org.netbeans.lib.awtextra.AbsoluteConstraints(495, 470, 320, -1));
+
+        jLabel7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/All_page_Background.png"))); // NOI18N
+        getContentPane().add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -205,7 +217,7 @@ public class ManageProduct extends javax.swing.JFrame {
         } else {
             try {
                 Connection con = ConnectionProvider.getCon();
-                PreparedStatement ps = con.prepareStatement("insert into product (name,quanitity,price,description,category_fk) values (?,?,?,?,?)");
+                PreparedStatement ps = con.prepareStatement("insert into product (name,quantity,price,description,category_fk) values (?,?,?,?,?)");
                 ps.setString(1, name);
                 ps.setString(2, quantity);
                 ps.setString(3, price);
@@ -241,7 +253,7 @@ public class ManageProduct extends javax.swing.JFrame {
             Statement st = con.createStatement();
             ResultSet rs = st.executeQuery("select * from product inner join category on product.category_fk=category.category_pk");
             while (rs.next()) {
-                model.addRow(new Object[]{rs.getString("product_pk"), rs.getString("name"), rs.getString("quanitity"), rs.getString("price"), rs.getString("description"), rs.getString("category_fk"), rs.getString(8)});
+                model.addRow(new Object[]{rs.getString("product_pk"), rs.getString("name"), rs.getString("quantity"), rs.getString("price"), rs.getString("description"), rs.getString("category_fk"), rs.getString(8)});
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e);
@@ -313,7 +325,7 @@ public class ManageProduct extends javax.swing.JFrame {
                     totalQuantity=totalQuantity+Integer.parseInt(quantity);
                 }
                 Connection con = ConnectionProvider.getCon();
-                PreparedStatement ps = con.prepareStatement("update product set name=?,quanitity=?,price=?,description=?,category_fk=? where product_pk=? ");
+                PreparedStatement ps = con.prepareStatement("update product set name=?,quantity=?,price=?,description=?,category_fk=? where product_pk=? ");
                 ps.setString(1, name);
                 ps.setInt(2, totalQuantity);
                 ps.setString(3, price);
@@ -329,6 +341,47 @@ public class ManageProduct extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_btnUpdateActionPerformed
+
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
+        // TODO add your handling code here:
+           if (productPk == 0) {
+        String errorMessage = "<html><body><b><font color='red'>Erreur:</font></b><br><i>Veuillez sélectionner un produit à supprimer.</i></body></html>";
+        JOptionPane.showMessageDialog(null, errorMessage, "Erreur", JOptionPane.ERROR_MESSAGE);
+    } else {
+        // Demander confirmation pour la suppression
+        int confirmation = JOptionPane.showConfirmDialog(null, 
+            "<html><body><b>Êtes-vous sûr de vouloir supprimer ce produit ?</b></body></html>", 
+            "Confirmation", JOptionPane.YES_NO_OPTION);
+        
+        if (confirmation == JOptionPane.YES_OPTION) {
+            try {
+                // Connexion à la base de données
+                Connection con = ConnectionProvider.getCon();
+                // Préparer la requête de suppression
+                PreparedStatement ps = con.prepareStatement("DELETE FROM product WHERE product_pk = ?");
+                ps.setInt(1, productPk);
+                
+                // Exécuter la suppression
+                int rowsAffected = ps.executeUpdate();
+                
+                if (rowsAffected > 0) {
+                    String successMessage = "<html><body><b><font color='green'>Succès:</font></b><br><i>Produit supprimé avec succès.</i></body></html>";
+                    JOptionPane.showMessageDialog(null, successMessage, "Succès", JOptionPane.INFORMATION_MESSAGE);
+                    
+                    // Rafraîchir l'affichage de la liste des produits
+                    setVisible(false);
+                    new ManageProduct().setVisible(true);
+                } else {
+                    String errorMessage = "<html><body><b><font color='red'>Erreur:</font></b><br><i>Erreur lors de la suppression du produit. Veuillez réessayer.</i></body></html>";
+                    JOptionPane.showMessageDialog(null, errorMessage, "Erreur", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception e) {
+                String exceptionMessage = "<html><body><b><font color='red'>Exception:</font></b><br><i>" + e.getMessage() + "</i></body></html>";
+                JOptionPane.showMessageDialog(null, exceptionMessage, "Exception", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+    }//GEN-LAST:event_btnDeleteActionPerformed
 
     /**
      * @param args the command line arguments
@@ -367,6 +420,7 @@ public class ManageProduct extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClose;
+    private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnReset;
     private javax.swing.JButton btnSave;
     private javax.swing.JButton btnUpdate;
@@ -377,6 +431,7 @@ public class ManageProduct extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblQuantity;
     private javax.swing.JTable tableProduct;

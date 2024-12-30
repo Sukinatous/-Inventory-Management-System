@@ -52,6 +52,8 @@ public class ManageCategory extends javax.swing.JFrame {
         btnReset = new javax.swing.JButton();
         btnclose = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
+        btnDelete = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
@@ -129,9 +131,19 @@ public class ManageCategory extends javax.swing.JFrame {
             }
         });
         getContentPane().add(btnclose, new org.netbeans.lib.awtextra.AbsoluteConstraints(743, 307, -1, -1));
-
-        jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/All_page_Background.png"))); // NOI18N
         getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
+
+        btnDelete.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        btnDelete.setText("Delete");
+        btnDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeleteActionPerformed(evt);
+            }
+        });
+        getContentPane().add(btnDelete, new org.netbeans.lib.awtextra.AbsoluteConstraints(485, 350, 330, -1));
+
+        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/All_page_Background.png"))); // NOI18N
+        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 560));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -226,6 +238,47 @@ public class ManageCategory extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnUpdateActionPerformed
 
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
+        // TODO add your handling code here:
+          if (categoryPk == 0) {
+        String errorMessage = "<html><body><b><font color='red'>Erreur:</font></b><br><i>Veuillez sélectionner une catégorie à supprimer.</i></body></html>";
+        JOptionPane.showMessageDialog(null, errorMessage, "Erreur", JOptionPane.ERROR_MESSAGE);
+    } else {
+        // Demander confirmation pour la suppression
+        int confirmation = JOptionPane.showConfirmDialog(null, 
+            "<html><body><b>Êtes-vous sûr de vouloir supprimer cette catégorie ?</b></body></html>", 
+            "Confirmation", JOptionPane.YES_NO_OPTION);
+        
+        if (confirmation == JOptionPane.YES_OPTION) {
+            try {
+                // Connexion à la base de données
+                Connection con = ConnectionProvider.getCon();
+                // Préparer la requête de suppression
+                PreparedStatement ps = con.prepareStatement("DELETE FROM category WHERE category_pk = ?");
+                ps.setInt(1, categoryPk);
+                
+                // Exécuter la suppression
+                int rowsAffected = ps.executeUpdate();
+                
+                if (rowsAffected > 0) {
+                    String successMessage = "<html><body><b><font color='green'>Succès:</font></b><br><i>Catégorie supprimée avec succès.</i></body></html>";
+                    JOptionPane.showMessageDialog(null, successMessage, "Succès", JOptionPane.INFORMATION_MESSAGE);
+                    
+                    // Rafraîchir l'affichage de la liste des catégories
+                    setVisible(false);
+                    new ManageCategory().setVisible(true);
+                } else {
+                    String errorMessage = "<html><body><b><font color='red'>Erreur:</font></b><br><i>Erreur lors de la suppression de la catégorie. Veuillez réessayer.</i></body></html>";
+                    JOptionPane.showMessageDialog(null, errorMessage, "Erreur", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception e) {
+                String exceptionMessage = "<html><body><b><font color='red'>Exception:</font></b><br><i>" + e.getMessage() + "</i></body></html>";
+                JOptionPane.showMessageDialog(null, exceptionMessage, "Exception", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+    }//GEN-LAST:event_btnDeleteActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -262,6 +315,7 @@ public class ManageCategory extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnReset;
     private javax.swing.JButton btnSave;
     private javax.swing.JButton btnUpdate;
@@ -269,6 +323,7 @@ public class ManageCategory extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tableCategory;
     private javax.swing.JTextField txtName;

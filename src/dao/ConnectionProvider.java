@@ -11,9 +11,9 @@ public class ConnectionProvider {
             Class.forName("com.mysql.cj.jdbc.Driver");
 
             // Define the connection URL
-            String url = "jdbc:mysql://localhost:3306/inventory?useSSL=false&serverTimezone=UTC";
+            String url = "jdbc:mysql://localhost:3308/inventory?useSSL=false&serverTimezone=UTC";
             String username = "root"; // Replace with your username
-            String password = "basmala123"; // Replace with your password
+            String password = "soukaina123.."; // Replace with your password
 
             // Establish the connection
             Connection con = DriverManager.getConnection(url, username, password);

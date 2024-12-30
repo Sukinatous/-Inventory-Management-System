@@ -16,6 +16,8 @@ import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import javax.swing.table.TableModel;
+import java.io.File;
+
 
 
 /*
@@ -289,7 +291,7 @@ public class ManageOrder extends javax.swing.JFrame {
 
             rs = st.executeQuery("select *from product inner join category on product.category_fk = category.category_pk");
             while (rs.next()) {
-                productModelmodel.addRow(new Object[]{rs.getString("product_Pk"), rs.getString("name"), rs.getString("price"), rs.getString("quanitity"), rs.getString("description"), rs.getString("category_fk"), rs.getString(8)});
+                productModelmodel.addRow(new Object[]{rs.getString("product_Pk"), rs.getString("name"), rs.getString("price"), rs.getString("quantity"), rs.getString("description"), rs.getString("category_fk"), rs.getString(8)});
 
             }
         } catch (Exception e) {
@@ -365,10 +367,10 @@ public class ManageOrder extends javax.swing.JFrame {
                 Statement st = con.createStatement();
                 ResultSet rs = st.executeQuery("select  * from product where product_pk=" + productPk + "");
                 while (rs.next()) {
-                    if (rs.getInt("quanitity") >= Integer.parseInt(noOfUnits)) {
+                    if (rs.getInt("quantity") >= Integer.parseInt(noOfUnits)) {
                         checkStock = 1;
                     } else {
-                        JOptionPane.showMessageDialog(null, "Product is out of stock. Only " + rs.getInt("quanitity") + " Left ");
+                        JOptionPane.showMessageDialog(null, "Product is out of stock. Only " + rs.getInt("quantity") + " Left ");
                     }
                 }
             } catch (Exception e) {
@@ -425,13 +427,16 @@ public class ManageOrder extends javax.swing.JFrame {
                 try {
                     Connection con = ConnectionProvider.getCon();
                     Statement st = con.createStatement();
-                    st.executeUpdate("update product set quanitity=quanitity-" + Integer.parseInt(dtm.getValueAt(i, 2).toString()) + " where product_pk=" + Integer.parseInt(dtm.getValueAt(i, 0).toString()));
+                    st.executeUpdate("update product set quantity=quantity-" + Integer.parseInt(dtm.getValueAt(i, 2).toString()) + " where product_pk=" + Integer.parseInt(dtm.getValueAt(i, 0).toString()));
 
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(null, e);
                 }
             }
         }
+        
+    
+
         try {
             SimpleDateFormat myFormat = new SimpleDateFormat("dd-MM-YYYY");
             Calendar cal = Calendar.getInstance();
